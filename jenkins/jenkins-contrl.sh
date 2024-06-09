@@ -30,8 +30,12 @@ sudo usermod -aG docker $USER
 wget https://github.com/aquasecurity/trivy/releases/download/v0.18.3/trivy_0.18.3_Linux-64bit.deb
 sudo dpkg -i trivy_0.18.3_Linux-64bit.deb
 sudo snap install trivy
-sudo mkdir /home/ubuntu/.kube
-echo "${kubeconfig}" >> /home/ubuntu/.kube/config
+sudo mkdir -p /home/ubuntu/.kube
+sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube/
+sudo chown -R ubuntu:ubuntu /home/ubuntu/.kube/*
+echo "${kubeconfig}" | sudo tee /home/ubuntu/.kube/config
+sudo chmod 755 /home/ubuntu/.kube/config
+sudo chmod 755 /home/ubuntu/.kube
 sudo apt install unzip
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
@@ -44,21 +48,24 @@ chmod +x ./aws-iam-authenticator
 sudo mv ./aws-iam-authenticator /usr/local/bin
 sudo su -c "aws configure set aws_access_key_id ${access-key}" ubuntu
 sudo su -c "aws configure set aws_secret_access_key ${secret-key}" ubuntu
-sudo su -c "aws configure set default.region eu-west-2" ubuntu
-sudo su -c "aws configure set default.output text" ubuntu
+sudo su -c "aws configure set region eu-west-2" ubuntu
+sudo su -c "aws configure set output" ubuntu
 ARCH=amd64
 PLATFORM=$(uname -s)_$ARCH
 curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
 tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
 sudo mv /tmp/eksctl /usr/local/bin
-sudo snap install helm --classic
-sudo su -c "helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx" ubuntu
-sudo su -c "helm repo update" ubuntu
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
 sudo hostnamectl set-hostname Jenkins-controller
 
 
 
-
+# sudo snap install helm --classic
 # sudo unzip -o spring-petclinic-2.4.3.war -d spring-petclinic-2.4.3
-# trivy fs --severity HIGH,CRITICAL spring-petclinic-2.4.3
-#port mapping in docker
+# # trivy fs --severity HIGH,CRITICAL spring-petclinic-2.4.3
+# # #port mapping in docker
+# sudo su -c "helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx" ubuntu
+# sudo su -c "helm repo update" ubuntu
+# aws eks --region ${region} update-kubeconfig --name ${cluster_name}

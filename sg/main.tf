@@ -11,6 +11,14 @@ resource "aws_security_group" "Jenkin_SG" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+ ingress {
+    description = "Allow ssh access"
+    from_port   = "443"
+    to_port     = "443"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
    ingress {
     description = "Allow inbound traffic"
     from_port   = "8080"
@@ -41,6 +49,13 @@ resource "aws_security_group" "Bastion_SG" {
     description = "Allow ssh access"
     from_port   = "22"
     to_port     = "22"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+ ingress {
+    description = "Allow ssh access"
+    from_port   = "443"
+    to_port     = "443"
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -116,7 +131,7 @@ resource "aws_security_group" "k8sNodes_SG" {
 }
 
 resource "aws_security_group" "rds_SG" {
-  name        = "k8sNodes_SG"
+  name        = "rds"
   description = "Allow Inbound traffic"
   vpc_id      = var.vpc
 
@@ -128,12 +143,12 @@ resource "aws_security_group" "rds_SG" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-    ingress {
-    description      = "Allow ssh access"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+   ingress {
+    description = "Allow ssh access"
+    from_port   = "22"
+    to_port     = "22"
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {

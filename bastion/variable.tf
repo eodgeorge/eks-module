@@ -6,3 +6,5 @@ variable "kubeconfig" {}
 variable "access-key" {}   
 variable "secret-key" {}    
 variable "prv-key" {}  
+variable "regions" {}  
+variable "cluster_name" {}  

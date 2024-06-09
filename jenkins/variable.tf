@@ -6,3 +6,5 @@ variable "agent_ip" {}
 variable "kubeconfig" {}
 variable "access-key" {}   
 variable "secret-key" {}  
+variable "regions" {}  
+variable "cluster_name" {}  

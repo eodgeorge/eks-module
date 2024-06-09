@@ -1,22 +1,42 @@
 provider "aws" {
-  region  = local.region
-  # profile = "default"
-  profile = "gooseaccess"
-
+  region  = var.region
+  profile = "eeks"
 }
 
-locals {
-  region = "eu-west-2"
+data "aws_availability_zones" "azs" {}
+
+terraform {
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.20.0"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.9.0"
+    }
+  }
 }
 
-  data "aws_availability_zones" "azs" {
-  state = "available"
+
+provider "helm" {
+  kubernetes {
+    host                   = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args   = ["eks", "get-token", "--cluster-name", module.eks.cluster_name, "--profile", "eeks"]
+
+    }
+  }
 }
 
-# locals {
-#   kubeconfig = file("${path.module}/bastion/kubeconfig.yaml")  # Adjust the path to your kubeconfig file
+
+
+# provider "kubernetes" {
+#   config_path = "${path.module}/kubeconfig.yaml"
 # }
 
-locals {
-  kubeconfig = file("${path.root}/kubeconfig.yaml")  # Adjust the path to your kubeconfig file
-}
+

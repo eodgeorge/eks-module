@@ -10,7 +10,9 @@ resource "aws_instance" "jenkins-controller" {
     kubeconfig              = var.kubeconfig
     access-key              = var.access-key
     secret-key              = var.secret-key
-  })
+    region                  = var.regions
+    cluster_name            = var.cluster_name
+    })
 
   user_data_replace_on_change = true
 

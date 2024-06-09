@@ -17,6 +17,5 @@ sudo chmod 755 /var/run/docker.sock
 sudo systemctl enable docker
 sudo systemctl start docker
 sudo usermod -aG docker $USER
-docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube
+sudo docker run -d --name sonarqube -p 9000:9000 -p 9092:9092 sonarqube
 sudo hostnamectl set-hostname sonar-server
-sudo reboot
