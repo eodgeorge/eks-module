@@ -43,3 +43,72 @@ sudo hostnamectl set-hostname Bastion
 # sudo su -c "helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx" ubuntu
 # sudo su -c "helm repo update" ubuntu
 # aws eks --region ${region} update-kubeconfig --name ${cluster_name}
+# docker pull username/repo/image/tag
+# sudo groupadd docker
+# sudo usermod -aG docker $USER
+# add port in console
+# https://index.docker.io/v1/
+#   MYSQL_URL: "mysql://$(MYSQL_USER):$(MYSQL_PASSWORD)@mysql-svc:$(PMA_PORT)/$(MYSQL_DATABASE)"
+
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: web-balde
+  name: web-balde
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-balde
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: web-balde
+    spec:
+      imagePullSecrets:
+      - name: balde
+      containers:
+      - name: balde
+        image: eodgeorge/balde:balde-v1.0
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: db-config
+        - secretRef:
+            name: db-secret
+        imagePullPolicy: Always
+      resources: {}
+status: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: balde
+spec:
+  ports:
+    - port: 8200
+      targetPort: 8080
+  selector:
+    app: web-balde
+  type: LoadBalancer
+
+
+apiVersion: v1
+data:
+  MYSQL_DATABASE: Petclinic
+  MYSQL_URL=jdbc:mysql://mysql-rdds.cvywsycko4uh.eu-west-2.rds.amazonaws.com:3306/petclinic
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: db-config
+ubuntu@Bastion:~$ vi db-config
+ubuntu@Bastion:~$ k apply -f db-config
+error: error parsing db-config: error converting YAML to JSON: yaml: line 5: could not find expected ':'
