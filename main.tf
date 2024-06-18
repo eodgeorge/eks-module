@@ -75,7 +75,6 @@ module "eks" {
 #   name = module.eks.cluster_name
 # }
 
-
 data "template_file" "kubeconfig" {
   template = <<-EOF
 apiVersion: v1
@@ -153,24 +152,27 @@ module "eks_blueprints_addons" {
     }
   }
   
-  
   enable_cluster_autoscaler           = true
   enable_argocd                       = true
   enable_metrics_server               = true
   enable_external_dns                 = true
   enable_cert_manager                 = true
   enable_kube_prometheus_stack        = true
-  secrets_store_csi_driver            = true
-    set = [{
+  enable_secrets_store_csi_driver     = true
+    secrets_store_csi_driver = { 
+      name            = "secrets-store-csi-driver"
+      version         = "1.4.3"
+      repository      = "https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts"
+      chart           = "secrets-store-csi-driver"
+      set = [{
             name = "syncSecret.enabled"
             value = "true"
           },
           {
-            name = "syncSecretRotation.enabled"
+            name  = "rotation.enabled"
             value = "true"
           }
-
-    }]
+    ]}
   enable_ingress_nginx                = true
   ingress_nginx = {
     chart_version = var.chart_version

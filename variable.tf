@@ -18,7 +18,7 @@ variable "region" { default = "eu-west-2" }
 variable "access-key" {}
 variable "secret-key" {}
 
-variable "chart_version" { default = "4.6.0" }
+variable "chart_version" { default = "4.9.0" }
 variable "namespace" { default = "ingress-nginx" }
 variable "repo" { default = "https://kubernetes.github.io/ingress-nginx" }
 # variable "values" { default = "./route53/ingress-values.yaml" }

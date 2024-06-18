@@ -8,3 +8,10 @@ variable "secret-key" {}
 variable "prv-key" {}  
 variable "regions" {}  
 variable "cluster_name" {}  
+
+
+
+
+
+# [templatefile("${path.module}/bastion/cluster-issuer-dns01" >> /home/ubuntu/cluster-issuer-dns01, {})]
+# [templatefile("${path.module}/bastion/ingress" >> /home/ubuntu/ingress, {})]
