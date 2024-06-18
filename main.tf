@@ -156,15 +156,32 @@ module "eks_blueprints_addons" {
   
   enable_cluster_autoscaler           = true
   enable_argocd                       = true
-  enable_ingress_nginx                = true
   enable_metrics_server               = true
   enable_external_dns                 = true
   enable_cert_manager                 = true
   enable_kube_prometheus_stack        = true
+  secrets_store_csi_driver            = true
+  
+  enable_ingress_nginx                = true
+  ingress_nginx = {
+    chart_version = var.chart_version
+    namespace     = var.namespace
+    repository    = var.repo
+    values        = [templatefile("${path.module}/route53-ssl/ingress-values.yaml", {})]
+  }
 
   tags = {
     "k8s-cluster" = "add-ons"
   }
+}
+
+data "kubernetes_service" "nginx_ingress" {
+  metadata {
+    name      = "ingress-nginx-controller"
+    namespace = "ingress_nginx"
+  }
+
+  depends_on = [module.eks_blueprints_addons]
 }
 
 module "bastion" {
@@ -198,11 +215,15 @@ module "jenkins" {
 
 module "rds" {
   source         = "./rds"
-  password       = "petclinic"
-  username       = "petclinic"
+  password       = jsondecode(module.secretmanager.rds_secret_string)["password"]
+  username       = jsondecode(module.secretmanager.rds_secret_string)["username"]
   rds-SG         = module.sg.rds_SG-id
   private-subnet = [module.vpc.private_subnets[0], module.vpc.private_subnets[1]]
 }
+
+module "secretmanager" {
+  source        = "./secretmanager"
+ }
 
 module "sg" {
   source = "./sg"
@@ -223,6 +244,13 @@ module "sonarqube" {
   sonarqube-SG  = module.sg.Sonarqube_SG-id
   key_name      = module.keypair.public-key
   public-subnet = module.vpc.public_subnets[0]
+}
+
+module "route53-ssl" {
+  source                 = "./route53-ssl"
+  domain_name            = "thinkeod.com"
+  a_domain_name          = "*.thinkeod.com"
+  nginx_ingress_lb_dns   = [data.kubernetes_service.nginx_ingress.status[0].load_balancer[0].ingress[0].hostname]
 }
 
 

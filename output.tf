@@ -22,8 +22,10 @@ output "rds-endpoint" { value = module.rds.rds-endpoint }
 
 output "rds-address" { value = module.rds.rds-address }
 
-
-
+output "nginx_ingress_lb_dns" {
+  value = [data.kubernetes_service.nginx_ingress.status[0].load_balancer[0].ingress[0].hostname]
+  description = "DNS name Nginx Ingress LB"
+}
 
 # terraform apply -var-file=stage.tfvars -auto-approve
 # kubectl create secret generic mysql-secret --type=opaque 
@@ -33,42 +35,8 @@ output "rds-address" { value = module.rds.rds-address }
 #   echo c2VjcmV0cw== | base64 -d    echo -n petclinic | base64
 
 
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: phpmyadmin
-#   labels:
-#     app: phpmyadmin
-# spec:
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#       app: phpmyadmin
-#   template:
-#     metadata:
-#       labels:
-#         app: phpmyadmin
-#     spec:
-#       containers:
-#       - name: phpmyadmin
-#         image: phpmyadmin/phpmyadmin:latest
-#         ports:
-#         - containerPort: 80
-#         env:
-#         - name: PMA_HOST
-#           value: mysql-service   # MySQL host
-#         - name: PMA_PORT
-#           value: "3306"          # MySQL port
-#         - name: PMA_USER
-#           value: "your_mysql_username"   # MySQL username
-#         - name: PMA_PASSWORD
-#           valueFrom:
-#             secretKeyRef:
-#               name: mysql-secret    # Name of the Secret containing MySQL password
-#               key: MYSQL_PASSWORD  # Key in the Secret containing MySQL password
-#         - name: PMA_DB_NAME
-#           value: "your_database_name"    # MySQL database name
 
-
-
-   
+# output "nginx_ingress_lb_dns" {
+#   value = [for svc in data.kubernetes_service.nginx_ingress.status : svc.load_balancer[0].ingress[0].hostname]
+#   description = "DNS name Nginx Ingress LB"
+# }
