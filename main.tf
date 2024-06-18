@@ -161,7 +161,16 @@ module "eks_blueprints_addons" {
   enable_cert_manager                 = true
   enable_kube_prometheus_stack        = true
   secrets_store_csi_driver            = true
-  
+    set = [{
+            name = "syncSecret.enabled"
+            value = "true"
+          },
+          {
+            name = "syncSecretRotation.enabled"
+            value = "true"
+          }
+
+    }]
   enable_ingress_nginx                = true
   ingress_nginx = {
     chart_version = var.chart_version
